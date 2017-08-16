@@ -19,48 +19,41 @@
 #
 ##############################################################################
 
-from openerp.osv import fields, osv
+from odoo import fields, models, api
 
 
-class project_timebox_fill(osv.TransientModel):
+class project_timebox_fill(models.TransientModel):
     _name = 'project.timebox.fill.plan'
     _description = 'Project Timebox Fill'
-    _columns = {
-        'timebox_id': fields.many2one(
-            'project.gtd.timebox', 'Get from Timebox', required=True),
-        'timebox_to_id': fields.many2one(
-            'project.gtd.timebox', 'Set to Timebox', required=True),
-        'task_ids': fields.many2many(
-            'project.task',
-            'project_task_rel', 'task_id', 'fill_id',
-            'Tasks selection')
-    }
 
-    def _get_from_tb(self, cr, uid, context=None):
-        ids = self.pool.get('project.gtd.timebox').search(
-            cr, uid, [], context=context)
-        return ids and ids[0] or False
+    @api.model
+    def _get_from_tb(self):
+        timeboxes = self.env['project.gtd.timebox'].search([])
+        return timeboxes and timeboxes[0] or False
 
-    def _get_to_tb(self, cr, uid, context=None):
-        if context is None:
-            context = {}
-        if 'active_id' in context:
-            return context['active_id']
-        return False
+    @api.model
+    def _get_to_tb(self):
+        return self.env.context.get('active_id')
 
-    _defaults = {
-        'timebox_id': _get_from_tb,
-        'timebox_to_id': _get_to_tb,
-    }
+    timebox_id = fields.Many2one(
+        'project.gtd.timebox', 'Get from Timebox', required=True,
+        default=_get_from_tb)
+    timebox_to_id = fields.Many2one(
+        'project.gtd.timebox', 'Set to Timebox', required=True,
+        default=_get_to_tb)
+    task_ids = fields.Many2many(
+        'project.task',
+        'project_task_rel', 'task_id', 'fill_id',
+        'Tasks selection')
 
-    def process(self, cr, uid, ids, context=None):
-        if not ids:
+    @api.model
+    def process(self):
+        if not self.env.ids:
             return {}
-        data = self.read(cr, uid, ids, [], context=context)
+        data = self.read([])
         if not data[0]['task_ids']:
             return {}
-        self.pool.get('project.task').write(
-            cr, uid, data[0]['task_ids'],
+        self.env['project.task'].browse(data[0]['task_ids']).write(
             {'timebox_id': data[0]['timebox_to_id'][0]})
         return {'type': 'ir.actions.act_window_close'}
 

@@ -19,49 +19,45 @@
 #
 ##############################################################################
 
-from openerp.osv import fields, osv
-from openerp.tools.translate import _
+from odoo import fields, models, api, exceptions
+from odoo.tools.translate import _
 
 
-class project_timebox_empty(osv.TransientModel):
+class project_timebox_empty(models.TransientModel):
     _name = 'project.timebox.empty'
     _description = 'Project Timebox Empty'
-    _columns = {
-        'name': fields.char('Name', size=32),
-    }
 
-    def view_init(self, cr, uid, fields_list, context=None):
-        if context is None:
-            context = {}
-        self._empty(cr, uid, context=context)
+    name = fields.Char('Name', size=32)
 
-    def _empty(self, cr, uid, context=None):
+    @api.model
+    def view_init(self, fields_list):
+        self._empty()
+
+    def _empty(self):
         close = []
         up = []
-        obj_tb = self.pool.get('project.gtd.timebox')
-        obj_task = self.pool.get('project.task')
+        timebox_model = self.env['project.gtd.timebox']
+        task_model = self.env['project.task']
 
-        if context is None:
-            context = {}
-        if 'active_id' not in context:
+        if 'active_id' not in self.env.context:
             return {}
 
-        ids = obj_tb.search(cr, uid, [], context=context)
-        if not len(ids):
-            raise osv.except_osv(
-                _('Error!'), _('No timebox child of this one!'))
-        tids = obj_task.search(
-            cr, uid, [('timebox_id', '=', context['active_id'])])
-        for task in obj_task.browse(cr, uid, tids, context):
+        timeboxes = timebox_model.search([])
+        if not timeboxes:
+            raise exceptions.UserError(
+                _('No timebox child of this one!'))
+        tasks = task_model.search([
+            ('timebox_id', '=', self.env.context['active_id'])])
+        for task in tasks:
             if (task.stage_id and task.stage_id.fold) \
-                    or (task.user_id.id != uid):
+                    or (task.user_id.id != self.env.uid):
                 close.append(task.id)
             else:
                 up.append(task.id)
         if up:
-            obj_task.write(cr, uid, up, {'timebox_id': ids[0]})
+            task_model.browse(up).write({'timebox_id': timeboxes[0].id})
         if close:
-            obj_task.write(cr, uid, close, {'timebox_id': False})
+            task_model.browse(close).write({'timebox_id': False})
         return {}
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

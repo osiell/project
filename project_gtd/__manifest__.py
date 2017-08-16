@@ -21,7 +21,7 @@
 
 {
     'name': 'Todo Lists',
-    'version': '8.0.2.0.0',
+    'version': '10.0.1.0.0',
     'category': 'Project Management',
     'sequence': 100,
     'summary': 'Personal Tasks, Contexts, Timeboxes',
@@ -56,7 +56,7 @@ performing those tasks.
     ],
     'demo': ['project_gtd_demo.xml'],
     'test': ['test/task_timebox.yml'],
-    'installable': False,
+    'installable': True,
     'auto_install': False,
 }
 
