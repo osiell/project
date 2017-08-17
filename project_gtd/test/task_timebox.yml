@@ -30,16 +30,16 @@
   !assert {model: project.task, id: project.project_task_10 , string: Task is not in Weekly Timebox }:
      - timebox_id.id != ref("timebox_weekly")
 -
-  I set Previous Timebox on task
--
-  !python {model: project.task}: |
-     previous_timebox = self.prev_timebox(cr, uid, [ref("project.project_task_10")],
-     {'active_ids': [ref("project_gtd.menu_open_gtd_timebox_tree")],})
-     assert previous_timebox == True, "I set Previous Timebox on task"
--
-  I set Next Timebox on task
--
-  !python {model: project.task}: |
-      next_timebox = self.next_timebox(cr, uid, [ref("project.project_task_10")],
-      {'active_ids': [ref("project_gtd.menu_open_gtd_timebox_tree")],})
-      assert next_timebox == True, "I set Next Timebox on task"
+#   I set Previous Timebox on task
+# -
+#   !python {model: project.task}: |
+#      previous_timebox = self.prev_timebox(cr, uid, [ref("project.project_task_10")],
+#      {'active_ids': [ref("project_gtd.menu_open_gtd_timebox_tree")],})
+#      assert previous_timebox == True, "I set Previous Timebox on task"
+# -
+#   I set Next Timebox on task
+# -
+#   !python {model: project.task}: |
+#       next_timebox = self.next_timebox(cr, uid, [ref("project.project_task_10")],
+#       {'active_ids': [ref("project_gtd.menu_open_gtd_timebox_tree")],})
+#       assert next_timebox == True, "I set Next Timebox on task"
