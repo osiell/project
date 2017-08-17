@@ -10,7 +10,7 @@
   I set the task from Daily Timebox to Weekly Timebox
 -
   !python {model: project.timebox.fill.plan}: |
-    self.process(cr, uid, [ref("plan_id")])
+    self.process([ref("plan_id")])
 -
   I check task is set to Weekly Timebox
 -
@@ -20,10 +20,10 @@
   I Empty the Weekly Timebox
 -
   !python {model: project.timebox.empty}: |
-      self._empty(cr, uid,  {"active_model": "project.gtd.timebox",
-      "active_ids":[ref("timebox_weekly")],
-      "active_id": ref("timebox_weekly"),
-      })
+      self.env.context["active_model"]:  "project.gtd.timebox"
+      self.env.context["active_ids"]: [ref("timebox_weekly")] 
+      self.env.context["active_id"]: ref("timebox_weekly")
+      self._empty()
 -
   I check task 'Develop Module in Sale Management' is no more in Weekly Timebox
 -
