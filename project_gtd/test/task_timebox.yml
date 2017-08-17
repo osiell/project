@@ -10,6 +10,7 @@
   I set the task from Daily Timebox to Weekly Timebox
 -
   !python {model: project.timebox.fill.plan}: |
+    self.env.ids: [ref("plan_id")]
     self.process([ref("plan_id")])
 -
   I check task is set to Weekly Timebox
